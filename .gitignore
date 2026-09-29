@@ -1,3 +1,7 @@
+# Temporary test file/folder
+temp_test*
+project_plan/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
