@@ -1,10 +1,41 @@
+# ============================================================
 # Temporary test file/folder
+# ============================================================
 temp_test*
 Archive/
 project_plan/
 
+
+# ============================================================
+# Credentials and secrets
+# ============================================================
+# Environment variable files
+.env
+.env.*
+!.env.example
+.envrc
+
+# Keys and cloud credentials
+*.pem
+*credentials*.json
+*service-account*.json
+
+# PyPI configuration file
+.pypirc
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+
+# ============================================================
+# OS files
+# ============================================================
 .DS_Store
 
+
+# ============================================================
+# Python
+# ============================================================
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -134,6 +165,15 @@ ipython_config.py
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
 
+# Virtual environments (.venv*/ also covers .venv-airflow and airflow_env/.venv)
+.venv
+.venv*/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
 # Celery stuff
 celerybeat-schedule
 celerybeat.pid
@@ -153,16 +193,6 @@ activemq-data/
 
 # SageMath parsed files
 *.sage.py
-
-# Environments
-.env
-.envrc
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
 
 # Spyder project settings
 .spyderproject
@@ -188,12 +218,13 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# PyCharm
-#   JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#   be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#   and can be added to the global gitignore or merged into this file.  For a more nuclear
-#   option (not recommended) you can uncomment the following to ignore the entire idea folder.
-# .idea/
+# Ruff stuff:
+.ruff_cache/
+
+# Marimo
+marimo/_static/
+marimo/_lsp/
+__marimo__/
 
 # Abstra
 #   Abstra is an AI-powered process automation framework.
@@ -201,25 +232,66 @@ cython_debug/
 #   Learn more at https://abstra.io/docs
 .abstra/
 
+# Note: uv.lock, pyproject.toml and .python-version must be committed
+
+
+# ============================================================
+# Docker
+# ============================================================
+.docker/
+docker-compose.override.yml
+
+
+# ============================================================
+# Terraform
+# ============================================================
+# Local .terraform directories
+terraform/.terraform/
+.terraform/
+
+# State files (may contain plaintext secrets)
+*.tfstate
+*.tfstate.*
+
+# Variable files (keep the example file)
+*.tfvars
+!example.tfvars
+
+# Crash logs
+crash.log
+crash.*.log
+
+
+# ============================================================
+# dbt
+# ============================================================
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+
+
+# ============================================================
+# Airflow
+# ============================================================
+.airflow/
+
+
+# ============================================================
+# Editors and IDEs
+# ============================================================
+# PyCharm
+#   JetBrains specific template is maintained in a separate JetBrains.gitignore that can
+#   be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+#   and can be added to the global gitignore or merged into this file.  For a more nuclear
+#   option (not recommended) you can uncomment the following to ignore the entire idea folder.
+# .idea/
+
 # Visual Studio Code
-#   Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
+#   Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore
 #   that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
-#   and can be added to the global gitignore or merged into this file. However, if you prefer, 
+#   and can be added to the global gitignore or merged into this file. However, if you prefer,
 #   you could uncomment the following to ignore the entire vscode folder
-# .vscode/
+.vscode/
+
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
-
-# Ruff stuff:
-.ruff_cache/
-
-# PyPI configuration file
-.pypirc
-
-# Marimo
-marimo/_static/
-marimo/_lsp/
-__marimo__/
-
-# Streamlit
-.streamlit/secrets.toml
