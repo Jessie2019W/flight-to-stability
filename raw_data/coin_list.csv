@@ -1,0 +1,13 @@
+coin_id,symbol,asset_class,selected_at,selection_basis
+bitcoin,btc,risk,2026-11-17,"market cap rank on selected_at; excl. stablecoins, wrapped, liquid staking tokens"
+ethereum,eth,risk,2026-11-17,"market cap rank on selected_at; excl. stablecoins, wrapped, liquid staking tokens"
+binancecoin,bnb,risk,2026-11-17,"market cap rank on selected_at; excl. stablecoins, wrapped, liquid staking tokens"
+ripple,xrp,risk,2026-11-17,"market cap rank on selected_at; excl. stablecoins, wrapped, liquid staking tokens"
+solana,sol,risk,2026-11-17,"market cap rank on selected_at; excl. stablecoins, wrapped, liquid staking tokens"
+tron,trx,risk,2026-11-17,"market cap rank on selected_at; excl. stablecoins, wrapped, liquid staking tokens"
+hyperliquid,hype,risk,2026-11-17,"market cap rank on selected_at; excl. stablecoins, wrapped, liquid staking tokens"
+zcash,zec,risk,2026-11-17,"market cap rank on selected_at; excl. stablecoins, wrapped, liquid staking tokens"
+monero,xmr,risk,2026-11-17,"market cap rank on selected_at; excl. stablecoins, wrapped, liquid staking tokens"
+dogecoin,doge,risk,2026-11-17,"market cap rank on selected_at; excl. stablecoins, wrapped, liquid staking tokens"
+tether,usdt,stablecoin,2026-11-17,fixed: major stablecoins
+usd-coin,usdc,stablecoin,2026-11-17,fixed: major stablecoins
