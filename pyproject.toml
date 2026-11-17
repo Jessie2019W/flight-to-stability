@@ -4,11 +4,14 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
+    "google-cloud-bigquery>=3.47.0",
+    "google-cloud-storage>=3.17.1",
     "pandas>=3.0.6",
     "requests>=2.34.2",
 ]
 
 [dependency-groups]
 dev = [
+    "ipykernel>=7.4.0",
     "pre-commit>=4.6.2",
 ]
