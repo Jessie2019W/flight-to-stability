@@ -23,3 +23,11 @@ repos:
     rev: v8.30.0
     hooks:
       - id: gitleaks
+
+  - repo: local
+    hooks:
+      - id: no-non-ascii
+        name: block non-English (non-ASCII) characters
+        language: pygrep
+        entry: '[^\x00-\x7F]'
+        types: [text]
