@@ -1,7 +1,9 @@
 """
 Load raw coin data records in GCS bucket.
 
-Auth is ADC (gcloud auth application-default login --impersonate-service-account=...).
+Auth: ADC holds your own user credentials (gcloud auth application-default login).
+If INGEST_IMPERSONATE_SA is set, the script impersonates that service account;
+if it is unset (e.g. on Cloud Composer), it uses the ADC identity directly.
 
 Usage:
     uv run --env-file .env python raw_data/load_to_gcs.py   # daily, 3 days
@@ -18,12 +20,15 @@ import google.auth
 import requests
 from coin_data import fetch_all, get_api_key, load_coin_ids
 from google.api_core.exceptions import Forbidden, GoogleAPICallError, NotFound
+from google.auth import impersonated_credentials
+from google.auth.credentials import Credentials
 from google.auth.exceptions import DefaultCredentialsError, RefreshError
 from google.auth.transport.requests import Request
 from google.cloud import storage
 
 PROJECT_ID = os.environ.get("GCP_PROJECT_ID", "your-gcp-project-id")
 BUCKET_NAME = os.environ.get("GCS_BUCKET", "your-dev-raw-bucket")
+INGEST_IMPERSONATE_SA = os.environ.get("INGEST_IMPERSONATE_SA")
 
 CLOUD_PLATFORM_SCOPE = "https://www.googleapis.com/auth/cloud-platform"
 GCS_PREFIX = "coingecko/market_chart"
@@ -31,25 +36,37 @@ DAILY_DAYS = 3
 MAX_UPLOAD_ATTEMPTS = 3
 
 
-def check_gcp_access(client: storage.Client, bucket_name: str) -> None:
-    """Fail fast, before any API call, if ADC is missing/expired or the bucket is not writable."""
+def get_credentials() -> Credentials:
+    """Return ADC credentials, impersonating INGEST_IMPERSONATE_SA when it is set.
+
+    Fails fast if ADC is missing/expired or impersonation is denied.
+    """
     try:
-        # impersonated ADC needs explicit scopes, otherwise generateAccessToken returns 400
         credentials, _ = google.auth.default(scopes=[CLOUD_PLATFORM_SCOPE])
-        credentials.refresh(
-            Request()
-        )  # raises if ADC is expired/revoked or impersonation is denied
+        if INGEST_IMPERSONATE_SA:
+            credentials = impersonated_credentials.Credentials(
+                source_credentials=credentials,
+                target_principal=INGEST_IMPERSONATE_SA,
+                target_scopes=[CLOUD_PLATFORM_SCOPE],
+            )
+        # raises if ADC is expired/revoked or impersonation is denied
+        credentials.refresh(Request())
     except DefaultCredentialsError:
-        sys.exit(
-            "No ADC found. Run: gcloud auth application-default login --impersonate-service-account=<SERVICE_ACCOUNT_EMAIL>"
-        )
+        sys.exit("No ADC found. Run: gcloud auth application-default login")
     except RefreshError as e:
         sys.exit(
-            f"Could not get a token from ADC ({e}). If it says invalid_grant, re-run the gcloud ADC "
-            "login command; if 403, check Token Creator on the service account and that the "
-            "IAM Service Account Credentials API is enabled."
+            f"Could not get a token ({e}). If it says invalid_grant, re-run "
+            "'gcloud auth application-default login'; if 403, check that your account has "
+            "Token Creator on INGEST_IMPERSONATE_SA and that the IAM Service Account "
+            "Credentials API is enabled."
         )
 
+    print(f"GCP identity: {getattr(credentials, 'service_account_email', 'ADC user')}")
+    return credentials
+
+
+def check_bucket_access(client: storage.Client, bucket_name: str) -> None:
+    """Fail fast, before any API call, if the bucket is missing or not writable."""
     try:
         granted = client.bucket(bucket_name).test_iam_permissions(
             ["storage.objects.create"]
@@ -67,9 +84,7 @@ def check_gcp_access(client: storage.Client, bucket_name: str) -> None:
             f"No write permission on bucket '{bucket_name}'. Grant roles/storage.objectUser."
         )
 
-    print(
-        f"GCP access OK: identity={getattr(credentials, 'service_account_email', 'user')}"
-    )
+    print(f"GCS access OK: bucket '{bucket_name}' is writable")
 
 
 def build_blob_path(ingest_date: str, run_type: str, coin_id: str) -> str:
@@ -126,8 +141,8 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
 
-    client = storage.Client(project=PROJECT_ID)
-    check_gcp_access(client, BUCKET_NAME)
+    client = storage.Client(project=PROJECT_ID, credentials=get_credentials())
+    check_bucket_access(client, BUCKET_NAME)
 
     session = requests.Session()
     session.headers["x-cg-demo-api-key"] = get_api_key()
